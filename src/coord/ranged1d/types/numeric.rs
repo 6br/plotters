@@ -1,5 +1,6 @@
 use std::convert::TryFrom;
 use std::ops::Range;
+use std::cmp;
 
 use crate::coord::ranged1d::{
     AsRangedCoord, DefaultFormatting, DiscreteRanged, KeyPointHint, NoDefaultFormatting, Ranged,
@@ -10,24 +11,23 @@ macro_rules! impl_discrete_trait {
     ($name:ident) => {
         impl DiscreteRanged for $name {
             fn size(&self) -> usize {
-                if &self.1 < &self.0 {
-                    return 0;
-                }
-                let values = self.1 - self.0;
+                let values = cmp::max(self.1, self.0) - cmp::min(self.1, self.0);
                 (values + 1) as usize
             }
 
             fn index_of(&self, value: &Self::ValueType) -> Option<usize> {
-                if value < &self.0 {
+                let min = cmp::min(self.0, self.1);
+                if value < &min {
                     return None;
                 }
-                let ret = value - self.0;
+                let ret = value - min;
                 Some(ret as usize)
             }
 
             fn from_index(&self, index: usize) -> Option<Self::ValueType> {
+                let value = cmp::min(self.0, self.1);
                 if let Ok(index) = Self::ValueType::try_from(index) {
-                    return Some(self.0 + index);
+                    return Some(value + index);
                 }
                 None
             }

@@ -242,6 +242,22 @@ mod test {
         assert_eq!(range.previous(&-10), None);
         assert_eq!(range.previous(&10), Some(9));
     }
+    #[test]
+    fn test_value_iter_rev() {
+        let range: crate::coord::ranged1d::types::RangedCoordi32 = (10..-10).into();
+
+        let values: Vec<_> = range.values().collect();
+
+        assert_eq!(21, values.len());
+
+        for (expected, value) in (10..=-10).zip(values) {
+            assert_eq!(expected, value);
+        }
+        assert_eq!(range.next(&5), Some(6));
+        assert_eq!(range.next(&10), None);
+        assert_eq!(range.previous(&-10), None);
+        assert_eq!(range.previous(&10), Some(9));
+    }
 
     #[test]
     fn test_centric_coord() {
